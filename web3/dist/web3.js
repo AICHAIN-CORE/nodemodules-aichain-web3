@@ -927,6 +927,13 @@ var SolidityParam = require('./param');
  */
 var formatInputInt = function (value) {
     BigNumber.config(c.ETH_BIGNUMBER_ROUNDING_MODE);
+    if( (value[0] == 'a' && value[1]== 'i')
+        || (value[0] == 'a' && value[1]== 'I')
+        || (value[0] == 'A' && value[1]== 'i')
+        || (value[0] == 'A' && value[1]== 'I'))
+    {
+        value = '0x' + value.substr(2, value.length-2);
+    }
     var result = utils.padLeft(utils.toTwosComplement(value).toString(16), 64);
     return new SolidityParam(result);
 };
@@ -2247,6 +2254,7 @@ var isStrictAddress = function (address) {
  * @return {Boolean}
 */
 var isAddress = function (address) {
+	  if(!address) return false;
 	  address=address.toLowerCase();
     if ((!/^(0x)?[0-9a-f]{40}$/i.test(address)) && (!/^(ai)?[0-9a-f]{40}$/i.test(address))) {
         // check if it has the basic requirements of an address
@@ -13656,6 +13664,12 @@ module.exports = XMLHttpRequest;
         function BigNumber( n, b ) {
             var c, e, i, num, len, str,
                 x = this;
+
+            if( typeof n === 'string' || (n && n.constructor && n.constructor.name === 'String')) {
+                if (n.indexOf('ai') === 0) {
+					          n = '0x'+ n.replace('ai','');
+					      }
+					  }
 
             // Enable constructor usage without new.
             if ( !( x instanceof BigNumber ) ) {
